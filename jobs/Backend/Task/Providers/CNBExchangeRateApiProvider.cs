@@ -115,6 +115,7 @@ namespace ExchangeRateUpdater.Providers
                     .Where(r => !string.IsNullOrWhiteSpace(r.CurrencyCode))
                     .Where(r => !string.Equals(r.CurrencyCode, _targetCurrencyCode, StringComparison.OrdinalIgnoreCase))
                     .Where(r => r.CurrencyCode is not null && requestedCodes.Contains(r.CurrencyCode))
+                    .Where(r => r.Amount != 0)
                     .Select(r =>
                     {
                         var normalizedRate = r.Rate / r.Amount;
