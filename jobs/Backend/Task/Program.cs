@@ -30,11 +30,13 @@ namespace ExchangeRateUpdater
         {
             try
             {
+                //Configuration
                 var configuration = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
+                //Dependency Injection
                 var services = new ServiceCollection();
                 ConfigureServices(services, configuration);
                 var serviceProvider = services.BuildServiceProvider();
@@ -64,7 +66,7 @@ namespace ExchangeRateUpdater
             services.AddLogging(configure =>
             {
                 configure.AddConsole();
-                configure.SetMinimumLevel(LogLevel.Debug);
+                configure.AddConfiguration(configuration.GetSection("Logging"));
             });
         }
     }

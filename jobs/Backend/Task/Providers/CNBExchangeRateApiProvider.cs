@@ -32,14 +32,16 @@ namespace ExchangeRateUpdater.Providers
             var apiBaseUrl = section.GetValue<string>("ApiBaseUrl") ?? throw new InvalidOperationException("ApiBaseUrl is not configured");
             _dailyRatesEndpoint = section.GetValue<string>("DailyRatesEndpoint") ?? throw new InvalidOperationException("DailyRatesEndpoint is not configured");
             _targetCurrencyCode = section.GetValue<string>("TargetCurrencyCode", "CZK")!;
+            var timeoutSeconds = section.GetValue<int>("TimeoutSeconds", 30);
+            var retryCount = section.GetValue<int>("RetryCount", 3);
 
             _httpClient.BaseAddress = new Uri(apiBaseUrl);
-            _httpClient.Timeout = TimeSpan.FromSeconds(10);
+            _httpClient.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
 
             _retryPolicy = Policy.HandleResult<HttpResponseMessage>(r => !r.IsSuccessStatusCode)
                 .Or<HttpRequestException>()
                 .WaitAndRetryAsync(
-                    retryCount: 3,
+                    retryCount: retryCount,
                     sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
                     onRetry: (outcome, timespan, retryCount, context) =>
                     {
